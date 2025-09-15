@@ -1,0 +1,65 @@
+# CIFAR-10 dataset configuration
+
+_target_: src.vision.data.cifar.CIFAR10DataModule
+
+# Dataset parameters
+name: "cifar10"
+data_dir: ${paths.data_dir}
+num_classes: 10
+input_size: [32, 32]
+
+# Data loading
+batch_size: 128
+num_workers: ${hardware.num_workers}
+pin_memory: ${hardware.pin_memory}
+persistent_workers: ${hardware.persistent_workers}
+
+# Data splits
+val_split: 0.1
+test_split: 0.0  # CIFAR-10 has separate test set
+seed: ${experiment.seed}
+
+# Normalization (CIFAR-10 statistics)
+mean: [0.4914, 0.4822, 0.4465]
+std: [0.2470, 0.2435, 0.2616]
+
+# Augmentation
+augment: true
+augmentation_config:
+  random_crop: true
+  crop_padding: 4
+  horizontal_flip: true
+  flip_prob: 0.5
+  rotation: true
+  rotation_degrees: 15
+  color_jitter: true
+  brightness: 0.2
+  contrast: 0.2
+  saturation: 0.2
+  hue: 0.1
+  random_erasing: true
+  erasing_p: 0.25
+  erasing_scale: [0.02, 0.33]
+  auto_augment: false
+  auto_augment_policy: "cifar10"
+  mixup: false
+  mixup_alpha: 0.2
+  cutmix: false
+  cutmix_alpha: 1.0
+
+# Dataset-specific settings
+classes:
+  - airplane
+  - automobile
+  - bird
+  - cat
+  - deer
+  - dog
+  - frog
+  - horse
+  - ship
+  - truck
+
+# Memory optimization
+cache_dataset: false
+prefetch_factor: 2

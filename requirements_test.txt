@@ -1,0 +1,30 @@
+# Testing BDD Framework Requirements
+
+# Core BDD Testing
+pytest>=7.4.0
+pytest-bdd>=6.1.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0
+pytest-html>=4.0.0
+
+# GUI Testing
+pytest-qt>=4.2.0
+pytest-xvfb>=3.0.0
+
+# Property-based Testing
+hypothesis>=6.80.0
+
+# Test Fixtures and Data
+pytest-factoryboy>=2.5.0
+factory-boy>=3.3.0
+
+# Mocking and Fixtures
+responses>=0.23.0
+freezegun>=1.2.0
+
+# Coverage and Reporting
+coverage>=7.2.0
+allure-pytest>=2.13.0
+
+# Testing Utilities
+testcontainers>=3.7.0

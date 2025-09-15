@@ -1,0 +1,49 @@
+# ResNet model configuration
+
+_target_: src.vision.models.classification.ResNetClassifier
+
+# Model architecture
+name: "resnet"
+resnet_version: "resnet50"  # resnet18, resnet34, resnet50, resnet101, resnet152
+num_classes: ${data.num_classes}
+pretrained: true
+freeze_backbone: false
+
+# Training parameters
+learning_rate: 0.001
+weight_decay: 0.0001
+dropout_rate: 0.5
+
+# Scheduler configuration
+scheduler_config:
+  type: "cosine"
+  T_max: ${trainer.max_epochs}
+  eta_min: 1e-6
+
+# Loss function
+loss:
+  type: "cross_entropy"
+  label_smoothing: 0.1
+
+# Model-specific optimizations
+optimization:
+  use_differential_lr: true
+  backbone_lr_multiplier: 0.1
+  warm_up_epochs: 5
+
+# Fine-tuning settings
+fine_tuning:
+  unfreeze_at_epoch: 10
+  gradual_unfreezing: true
+  layers_per_epoch: 2
+
+# Architecture modifications
+modifications:
+  use_se_blocks: false  # Squeeze-and-Excitation blocks
+  use_cbam: false  # Convolutional Block Attention Module
+  replace_stride_with_dilation: [false, false, false]
+
+# Output settings
+output:
+  return_features: false
+  feature_layers: []  # Which layers to extract features from

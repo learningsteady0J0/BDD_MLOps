@@ -1,0 +1,59 @@
+# Default PyTorch Lightning Trainer configuration
+
+_target_: pytorch_lightning.Trainer
+
+# Training duration
+max_epochs: 100
+min_epochs: 10
+max_steps: -1  # -1 means no limit
+limit_train_batches: 1.0
+limit_val_batches: 1.0
+limit_test_batches: 1.0
+limit_predict_batches: 1.0
+
+# Validation settings
+check_val_every_n_epoch: 1
+val_check_interval: 1.0
+
+# Hardware
+accelerator: ${hardware.accelerator}
+devices: ${hardware.devices}
+precision: ${hardware.precision}
+sync_batchnorm: false
+
+# Optimization
+gradient_clip_val: ${optimization.gradient_clip_val}
+gradient_clip_algorithm: ${optimization.gradient_clip_algorithm}
+accumulate_grad_batches: ${optimization.accumulate_grad_batches}
+automatic_optimization: ${optimization.automatic_optimization}
+
+# Logging and debugging
+log_every_n_steps: ${monitoring.log_every_n_steps}
+enable_progress_bar: true
+enable_model_summary: true
+profiler: ${debug.profiler}
+detect_anomaly: ${debug.detect_anomaly}
+track_grad_norm: ${debug.track_grad_norm}
+
+# Development/debugging
+fast_dev_run: ${debug.fast_dev_run}
+overfit_batches: ${debug.overfit_batches}
+
+# Reproducibility
+deterministic: ${reproducibility.deterministic}
+benchmark: ${reproducibility.benchmark}
+
+# Strategy (for distributed training)
+strategy: "auto"  # auto, ddp, ddp_spawn, deepspeed, etc.
+
+# Checkpointing
+enable_checkpointing: true
+default_root_dir: ${paths.output_dir}
+
+# Early stopping patience (if using early stopping callback)
+# Set via callbacks configuration
+
+# Other settings
+num_sanity_val_steps: 2
+reload_dataloaders_every_n_epochs: 0
+replace_sampler_ddp: true

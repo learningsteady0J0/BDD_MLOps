@@ -1,0 +1,30 @@
+# MLflow logger configuration
+
+enable: true
+type: "mlflow"
+
+# MLflow settings
+tracking_uri: "file:./mlruns"
+experiment_name: ${experiment.name}
+run_name: null  # Auto-generated if null
+save_dir: "./mlruns"
+
+# Logging options
+log_model: true
+log_hyperparameters: true
+log_every_n_steps: ${monitoring.log_every_n_steps}
+
+# Artifact logging
+log_artifacts:
+  - "*.yaml"  # Config files
+  - "*.log"   # Log files
+
+# Tags (additional to experiment.tags)
+tags:
+  framework: "pytorch_lightning"
+  task: "vision"
+
+# Advanced settings
+nested_run: false
+run_id: null  # Resume from specific run
+artifact_location: null
