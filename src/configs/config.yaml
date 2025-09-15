@@ -1,0 +1,218 @@
+# Main configuration file for the PyTorch Lightning AI Training Framework
+# This file uses Hydra for configuration management
+
+defaults:
+  - model: resnet50  # Model configuration
+  - dataset: imagenet  # Dataset configuration
+  - trainer: default  # Training configuration
+  - callbacks: default  # Callback configuration
+  - optimizer: adamw  # Optimizer configuration
+  - scheduler: cosine  # Learning rate scheduler
+  - augmentation: standard  # Data augmentation
+  - experiment: baseline  # Experiment configuration
+  - _self_
+
+# Hydra configuration
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+  launcher:
+    _target_: hydra._internal.core_plugins.basic_launcher.BasicLauncher
+  sweeper:
+    _target_: hydra._internal.core_plugins.basic_sweeper.BasicSweeper
+    max_batch_size: null
+  help:
+    template: |
+      PyTorch Lightning AI Training Framework
+
+      Usage:
+        python train.py [OPTIONS]
+
+      Config groups:
+        model: ${model}
+        dataset: ${dataset}
+        trainer: ${trainer}
+
+      Override examples:
+        python train.py model=vit dataset=cifar10
+        python train.py trainer.max_epochs=100 optimizer.lr=0.001
+        python train.py +experiment=custom_exp
+
+# Framework configuration
+framework:
+  name: "PyTorch Lightning AI Framework"
+  version: "1.0.0"
+  debug: false
+  seed: 42
+  deterministic: true
+
+# Plugin configuration
+plugins:
+  auto_discover: true
+  plugin_dirs:
+    - src/plugins
+    - ${oc.env:PLUGIN_PATH,plugins}
+  enabled_domains:
+    - vision
+    - nlp
+    - timeseries
+    - audio
+
+# MLOps configuration
+mlops:
+  tracking:
+    backend: mlflow
+    uri: ${oc.env:MLFLOW_TRACKING_URI,mongodb://localhost:27017}
+    experiment_name: ${experiment.name}
+    run_name: ${model.name}_${dataset.name}_${now:%Y%m%d_%H%M%S}
+    artifact_location: ${oc.env:MLFLOW_ARTIFACT_ROOT,./mlruns}
+
+  registry:
+    backend: mlflow
+    uri: ${mlops.tracking.uri}
+
+  monitoring:
+    enabled: true
+    log_interval: 10
+    metrics:
+      - loss
+      - accuracy
+      - learning_rate
+
+  storage:
+    backend: mongodb
+    uri: ${oc.env:MONGODB_URI,mongodb://localhost:27017}
+    database: ml_experiments
+    collections:
+      experiments: experiments
+      runs: runs
+      models: models
+      datasets: datasets
+
+# Distributed training configuration
+distributed:
+  enabled: false
+  backend: nccl  # nccl, gloo, mpi
+  strategy: ddp  # ddp, ddp_spawn, deepspeed, fsdp
+  num_nodes: 1
+  devices: auto  # auto, cpu, gpu, tpu
+  accelerator: auto  # auto, cpu, gpu, tpu
+  precision: 16  # 16, 32, bf16
+
+# Resource management
+resources:
+  gpu:
+    enabled: ${oc.decode:${oc.env:CUDA_VISIBLE_DEVICES,false}}
+    memory_fraction: 0.95
+    allow_growth: true
+  cpu:
+    num_threads: ${oc.env:OMP_NUM_THREADS,4}
+    pin_memory: true
+  memory:
+    limit_gb: null
+    cache_size_gb: 2
+
+# Logging configuration
+logging:
+  level: INFO
+  format: "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s"
+  file:
+    enabled: true
+    path: logs/${hydra.runtime.output_dir}/train.log
+  console:
+    enabled: true
+    rich_format: true
+  mlflow:
+    enabled: true
+    log_every_n_steps: 10
+  tensorboard:
+    enabled: false
+    log_dir: logs/tensorboard
+  wandb:
+    enabled: false
+    project: ${experiment.project}
+    entity: ${oc.env:WANDB_ENTITY,null}
+
+# Checkpointing configuration
+checkpoint:
+  enabled: true
+  dir: checkpoints/${experiment.name}
+  monitor: val_loss
+  mode: min
+  save_top_k: 3
+  save_last: true
+  save_weights_only: false
+  auto_insert_metric_name: true
+  filename: "{epoch:02d}-{val_loss:.4f}"
+
+# Early stopping configuration
+early_stopping:
+  enabled: true
+  monitor: val_loss
+  mode: min
+  patience: 10
+  min_delta: 0.0001
+  verbose: true
+
+# Data configuration
+data:
+  root_dir: ${oc.env:DATA_ROOT,./data}
+  cache_dir: ${data.root_dir}/.cache
+  num_workers: ${oc.env:NUM_WORKERS,4}
+  persistent_workers: true
+  pin_memory: true
+  prefetch_factor: 2
+
+# Experiment configuration
+experiment:
+  name: ${model.name}_${dataset.name}
+  project: ml_framework
+  tags:
+    - ${model.name}
+    - ${dataset.name}
+    - ${trainer.name}
+  description: "Training ${model.name} on ${dataset.name}"
+
+# Reproducibility
+reproducibility:
+  seed: ${framework.seed}
+  deterministic: ${framework.deterministic}
+  benchmark: false
+
+# Validation configuration
+validation:
+  enabled: true
+  interval: 1  # Validate every N epochs
+  verbose: true
+  sanity_checks: 2  # Number of sanity validation steps
+
+# Testing configuration
+testing:
+  enabled: true
+  best_checkpoint: true  # Use best checkpoint for testing
+  verbose: true
+
+# Inference configuration
+inference:
+  batch_size: 1
+  use_onnx: false
+  optimize: true
+  device: cuda
+
+# API configuration
+api:
+  enabled: false
+  host: 0.0.0.0
+  port: 8000
+  workers: 4
+  reload: false
+
+# Environment variables resolver
+env:
+  cuda_visible_devices: ${oc.env:CUDA_VISIBLE_DEVICES,}
+  wandb_api_key: ${oc.env:WANDB_API_KEY,}
+  mlflow_tracking_uri: ${oc.env:MLFLOW_TRACKING_URI,}
+  mongodb_uri: ${oc.env:MONGODB_URI,}

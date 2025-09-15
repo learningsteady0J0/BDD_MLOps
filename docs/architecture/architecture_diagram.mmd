@@ -1,0 +1,184 @@
+```mermaid
+graph TB
+    subgraph "User Interface Layer"
+        CLI[CLI Interface]
+        API[REST API]
+        JN[Jupyter Notebooks]
+        WEB[Web Dashboard]
+    end
+
+    subgraph "Configuration Management"
+        HYDRA[Hydra Config Manager]
+        YAML[YAML Configs]
+        ENV[Environment Variables]
+    end
+
+    subgraph "Orchestration Layer"
+        TM[Training Manager]
+        EM[Experiment Manager]
+        VM[Validation Manager]
+        PM[Prediction Manager]
+    end
+
+    subgraph "Core Framework"
+        subgraph "Base Classes"
+            BM[BaseModel]
+            BD[BaseDataModule]
+            BC[BaseCallback]
+            BMT[BaseMetric]
+        end
+
+        subgraph "Registry System"
+            PR[Plugin Registry]
+            MR[Model Registry]
+            DR[Dataset Registry]
+        end
+
+        subgraph "Contracts"
+            IF[Interfaces]
+            VAL[Validators]
+            TYP[Type Definitions]
+        end
+    end
+
+    subgraph "Domain Plugins"
+        subgraph "Vision"
+            VIM[Vision Models]
+            VID[Vision Datasets]
+            VIT[Vision Transforms]
+        end
+
+        subgraph "NLP"
+            NLM[NLP Models]
+            NLD[NLP Datasets]
+            NLT[Tokenizers]
+        end
+
+        subgraph "TimeSeries"
+            TSM[TS Models]
+            TSD[TS Datasets]
+            TSP[TS Preprocessors]
+        end
+    end
+
+    subgraph "PyTorch Lightning"
+        PLT[Lightning Trainer]
+        PLM[Lightning Module]
+        PLD[Lightning DataModule]
+        PLC[Lightning Callbacks]
+    end
+
+    subgraph "MLOps Infrastructure"
+        subgraph "Experiment Tracking"
+            MLF[MLflow Server]
+            MDB[MongoDB Backend]
+        end
+
+        subgraph "Model Management"
+            MS[Model Store]
+            MV[Model Versioning]
+            MD[Model Deployment]
+        end
+
+        subgraph "Distributed Training"
+            DDP[DDP Strategy]
+            FSDP[FSDP Strategy]
+            DS[DeepSpeed]
+        end
+    end
+
+    subgraph "Storage Layer"
+        FS[File System]
+        S3[S3 Storage]
+        CACHE[Cache Layer]
+    end
+
+    %% User interactions
+    CLI --> TM
+    API --> TM
+    JN --> TM
+    WEB --> EM
+
+    %% Configuration flow
+    HYDRA --> TM
+    YAML --> HYDRA
+    ENV --> HYDRA
+
+    %% Training flow
+    TM --> PLT
+    EM --> MLF
+    VM --> PLT
+    PM --> PLT
+
+    %% Core framework connections
+    PLT --> PLM
+    PLT --> PLD
+    PLT --> PLC
+
+    BM --> PLM
+    BD --> PLD
+    BC --> PLC
+
+    %% Plugin system
+    PR --> VIM
+    PR --> NLM
+    PR --> TSM
+    PR --> VID
+    PR --> NLD
+    PR --> TSD
+
+    %% Model flow
+    VIM --> BM
+    NLM --> BM
+    TSM --> BM
+
+    %% Data flow
+    VID --> BD
+    NLD --> BD
+    TSD --> BD
+
+    %% MLOps connections
+    PLT --> MLF
+    MLF --> MDB
+    PLT --> MS
+    MS --> MV
+    MV --> MD
+
+    %% Distributed training
+    PLT --> DDP
+    PLT --> FSDP
+    PLT --> DS
+
+    %% Storage connections
+    MS --> FS
+    MS --> S3
+    BD --> CACHE
+    CACHE --> FS
+
+    style CLI fill:#e1f5fe
+    style API fill:#e1f5fe
+    style JN fill:#e1f5fe
+    style WEB fill:#e1f5fe
+
+    style HYDRA fill:#fff3e0
+    style YAML fill:#fff3e0
+    style ENV fill:#fff3e0
+
+    style TM fill:#f3e5f5
+    style EM fill:#f3e5f5
+    style VM fill:#f3e5f5
+    style PM fill:#f3e5f5
+
+    style BM fill:#e8f5e9
+    style BD fill:#e8f5e9
+    style BC fill:#e8f5e9
+    style BMT fill:#e8f5e9
+
+    style PR fill:#fce4ec
+    style MR fill:#fce4ec
+    style DR fill:#fce4ec
+
+    style MLF fill:#fff9c4
+    style MDB fill:#fff9c4
+    style MS fill:#fff9c4
+```
